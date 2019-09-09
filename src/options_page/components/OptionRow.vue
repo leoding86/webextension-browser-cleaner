@@ -1,9 +1,9 @@
 <template>
   <el-row class="option-row">
-    <el-col :span="18" class="option-label">
+    <el-col :span="14" class="option-label">
       {{ label }}
     </el-col>
-    <el-col :span="6" class="option-control" :class="{'option-control-align-left': controlAlignLeft}">
+    <el-col :span="10" class="option-control" :class="{'option-control-align-left': controlAlignLeft}">
       <slot></slot>
     </el-col>
   </el-row>
