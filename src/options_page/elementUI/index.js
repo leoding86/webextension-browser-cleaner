@@ -13,7 +13,8 @@ import {
   Checkbox,
   Divider,
   Footer,
-  Badge
+  Badge,
+  Tree
 } from 'element-ui';
 
 Vue.use(Container);
@@ -30,3 +31,4 @@ Vue.use(Checkbox);
 Vue.use(Divider);
 Vue.use(Footer);
 Vue.use(Badge);
+Vue.use(Tree);
