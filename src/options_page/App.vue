@@ -14,7 +14,7 @@
             @click="openInTab('https://chrome.google.com/webstore/detail/bmplnhifhfmmkjmeffbbahieajpmonla')">
             <img src="@/assets/chrome-es.png"> Give 5 Stars!</el-button>
           <el-button size="medium" round class="support-button"
-            @click="openInTab('#')">
+            @click="openInTab('https://github.com/leoding86/webextension-browser-cleaner')">
             <img src="@/assets/github.svg"> Star It!</el-button>
           <el-button size="medium" round class="support-button"
             @click="openInTab('https://www.patreon.com/leoding')">
