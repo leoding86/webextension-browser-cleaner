@@ -1,5 +1,6 @@
 import browser from '@/modules/Browser';
 import Notification from '@/modules/Notification';
+import CleanDataTypesParser from '@/modules/CleanDataTypesParser';
 
 /**
  * @class
@@ -70,7 +71,7 @@ class App {
     let self = this;
 
     return new Promise((resolve, reject) => {
-      browser.browsingData.remove({}, self.storageItems.clearDataTypes, () => {
+      browser.browsingData.remove({}, CleanDataTypesParser.getCleanDataTypesOption(self.storageItems.cleanDataTypes), () => {
         if (!browser.runtime.lastError) {
           resolve();
           return;
