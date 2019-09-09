@@ -11,30 +11,23 @@
                 :value="1"
                 :label="'Open options'"></el-option>
               <el-option value="2"
-                :label="'Clear data'"></el-option>
+                :label="'Clean data'"></el-option>
             </el-select>
           </option-row>
           <option-row label="Show notification">
             <el-checkbox v-model="displayNotification"></el-checkbox>
           </option-row>
           <el-divider></el-divider>
-          <option-row label="Clear data in ..."
+          <option-row label="Clean data in ..."
             :control-align-left="true">
-            <el-checkbox :indeterminate="indeterminate" v-model="clearAll" @change="handleClearAllChanged">All</el-checkbox>
-            <el-checkbox v-model="clearDataTypes.appcache">appcache</el-checkbox>
-            <el-checkbox v-model="clearDataTypes.cache">cache</el-checkbox>
-            <el-checkbox v-model="clearDataTypes.cacheStorage">cacheStorage</el-checkbox>
-            <el-checkbox v-model="clearDataTypes.cookies">cookies</el-checkbox>
-            <el-checkbox v-model="clearDataTypes.downloads">downloads</el-checkbox>
-            <el-checkbox v-model="clearDataTypes.fileSystems">fileSystems</el-checkbox>
-            <el-checkbox v-model="clearDataTypes.formData">formData</el-checkbox>
-            <el-checkbox v-model="clearDataTypes.history">history</el-checkbox>
-            <el-checkbox v-model="clearDataTypes.indexedDB">indexedDB</el-checkbox>
-            <el-checkbox v-model="clearDataTypes.localStorage">localStorage</el-checkbox>
-            <!-- <el-checkbox>pluginData</el-checkbox> -->
-            <el-checkbox v-model="clearDataTypes.passwords">passwords</el-checkbox>
-            <el-checkbox v-model="clearDataTypes.serviceWorkers">serviceWorkers</el-checkbox>
-            <el-checkbox v-model="clearDataTypes.webSQL">webSQL</el-checkbox>
+
+            <el-tree ref="cleanDataTypesTree"
+              :data="dataTypes"
+              show-checkbox
+              node-key="type"
+              @check="handleDataTypeCheck">
+            </el-tree>
+
           </option-row>
         </el-card>
       </el-col>
@@ -45,6 +38,7 @@
 <script>
 import browser from '@/modules/Browser';
 import OptionRow from './OptionRow';
+import CleanDataTypesParser from '@/modules/CleanDataTypesParser';
 
 export default {
   components: {
@@ -53,10 +47,86 @@ export default {
 
   data() {
     return {
-      clearAll: null,
-      clearDataTypes: app.storageItems.clearDataTypes,
       clickExtensionIconTo: app.storageItems.clickExtensionIconTo,
-      displayNotification: app.storageItems.displayNotification
+      displayNotification: app.storageItems.displayNotification,
+      dataTypes: [
+        {
+          type: 'wrapper:browsing-and-download-history',
+          label: 'Browsing and download history',
+          children: [
+            {
+              type: 'history',
+              label: 'Browsing history'
+            },
+            {
+              type: 'downloads',
+              label: 'Download history'
+            }
+          ]
+        },
+        {
+          type: 'wrapper:cached-images-and-files',
+          label: 'Cached images and files',
+          children: [
+            {
+              type: 'appcache',
+              label: 'App cache'
+            },
+            {
+              type: 'cache',
+              label: 'Cache'
+            },
+            {
+              type: 'cacheStorage',
+              label: 'Cache storage'
+            }
+          ]
+        },
+        {
+          type: 'wrapper:cookies-and-site-data',
+          label: 'Cookies and site data',
+          children: [
+            {
+              type: 'cookies',
+              label: 'Cookies'
+            },
+            {
+              type: 'fileSystems',
+              label: 'File systems'
+            },
+            {
+              type: 'indexedDB',
+              label: 'IndexedDB'
+            },
+            {
+              type: 'localStorage',
+              label: 'Local Storage'
+            },
+            {
+              type: 'serviceWorkers',
+              label: 'Service Workers'
+            },
+            {
+              type: 'webSQL',
+              label: 'Web SQL'
+            }
+          ]
+        },
+        {
+          type: 'wrapper:passwords-and-autofill-form-data',
+          label: 'Passwords and autofill form data',
+          children: [
+            {
+              type: 'passwords',
+              label: 'Passwords'
+            },
+            {
+              type: 'formData',
+              label: 'Autofill form data'
+            }
+          ]
+        }
+      ]
     }
   },
 
@@ -73,10 +143,10 @@ export default {
       });
     },
 
-    clearDataTypes: {
+    cleanDataTypes: {
       handler: function(val) {
         browser.storage.local.set({
-          clearDataTypes: val
+          cleanDataTypes: val
         });
       },
       deep: true
@@ -88,23 +158,31 @@ export default {
       let checkedExists = false;
       let uncheckedExists = false;
 
-      Object.keys(this.clearDataTypes).forEach(type => {
-        if (this.clearDataTypes[type]) {
+      Object.keys(this.cleanDataTypes).forEach(type => {
+        if (this.cleanDataTypes[type]) {
           checkedExists = true;
         } else {
           uncheckedExists = true;
         }
       });
 
-      this.clearAll = checkedExists && !uncheckedExists;
+      this.cleanAll = checkedExists && !uncheckedExists;
       return checkedExists && uncheckedExists;
     }
   },
 
+  mounted() {
+    this.$refs.cleanDataTypesTree.setCheckedKeys(app.storageItems.cleanDataTypes);
+  },
+
   methods: {
-    handleClearAllChanged(val) {
-      Object.keys(this.clearDataTypes).forEach(type => {
-        this.clearDataTypes[type] = !!val;
+    handleDataTypeCheck() {
+      let checkedDataTypes = this.$refs.cleanDataTypesTree.getCheckedKeys();
+
+      let cleanDataTypes = CleanDataTypesParser.filterCleanDataTypes(checkedDataTypes);
+
+      browser.storage.local.set({
+        cleanDataTypes: cleanDataTypes
       });
     }
   }
