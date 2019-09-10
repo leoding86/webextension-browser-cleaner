@@ -1,8 +1,8 @@
 <template>
   <div>
     <el-row>
-      <el-col :sm="4" :lg="7" class="hidden-xs-only">&nbsp;</el-col>
-      <el-col :sm="16" :lg="10" :xs="24">
+      <el-col :sm="2" :md="3" :lg="6" class="hidden-xs-only">&nbsp;</el-col>
+      <el-col :sm="20" :md="18" :lg="12" :xs="24">
         <el-card>
           <option-row label="Click extension icon to ...">
             <el-tooltip v-if="clickExtensionIconTo != 1" content="You can right-click the extension icon and click the 'Option' menu to open options page.">
@@ -86,9 +86,9 @@ export default {
   data() {
     return {
       whitelistText: '',
-      whitelist: app.storageItems.whitelist,
-      clickExtensionIconTo: app.storageItems.clickExtensionIconTo,
-      displayNotification: app.storageItems.displayNotification,
+      whitelist: [],
+      clickExtensionIconTo: null,
+      displayNotification: null,
       dataTypes: [
         {
           type: 'wrapper:browsing-and-download-history',
@@ -240,10 +240,21 @@ export default {
         });
       },
       deep: true
+    },
+
+    storageItems: {
+      handler: function(val) {
+        this.whitelistText = val.whitelist.join('\r\n');
+      },
+      deep: true
     }
   },
 
   computed: {
+    storageItems() {
+      return this.$root.$data.storageItems;
+    },
+
     indeterminate() {
       let checkedExists = false;
       let uncheckedExists = false;
@@ -261,10 +272,16 @@ export default {
     }
   },
 
-  mounted() {
-    this.$refs.cleanDataTypesTree.setCheckedKeys(app.storageItems.cleanDataTypes);
-    this.$refs.cleanDataTypesInWhitelistTree.setCheckedKeys(app.storageItems.cleanWhitelistDataTypes);
+  beforeMount() {
+    this.whitelist = this.storageItems.whitelist;
+    this.clickExtensionIconTo = this.storageItems.clickExtensionIconTo;
+    this.displayNotification = this.storageItems.displayNotification;
     this.whitelistText = this.whitelist.length > 0 ? this.whitelist.join("\r\n") : '';
+  },
+
+  mounted() {
+    this.$refs.cleanDataTypesTree.setCheckedKeys(this.storageItems.cleanDataTypes);
+    this.$refs.cleanDataTypesInWhitelistTree.setCheckedKeys(this.storageItems.cleanWhitelistDataTypes);
   },
 
   methods: {
