@@ -16,9 +16,9 @@
           <el-button size="medium" round class="support-button"
             @click="openInTab('https://github.com/leoding86/webextension-browser-cleaner')">
             <img src="@/assets/github.svg"> Star It!</el-button>
-          <el-button size="medium" round class="support-button"
+          <!-- <el-button size="medium" round class="support-button"
             @click="openInTab('https://www.patreon.com/leoding')">
-            <img src="@/assets/patreon.png"> Become a Patron!</el-button>
+            <img src="@/assets/patreon.png"> Become a Patron!</el-button> -->
           <el-divider direction="vertical"></el-divider>
           <el-badge value="4.8 ⭐">
             <el-button size="medium" round class="support-button"
@@ -69,15 +69,15 @@ export default {
     span {
       position: relative;
       font-size: 20px;
-      color:#069576;
-      text-shadow: 1px 1px 0 #1ec19d;
+      color:#13b693;
+      text-shadow: 0px 1px 0 #0d5d4c;
       top: 3px;
     }
 
     .header-icon {
       margin-right: 10px;
       border-radius: 30px;
-      box-shadow: 3px 3px 0px #069576;
+      box-shadow: 0px 3px 0px #069576;
       vertical-align: middle;
     }
   }
@@ -92,7 +92,7 @@ export default {
     position: relative;
     padding-left: 50px!important;
     overflow: hidden;
-    box-shadow:3px 3px 0px #ccc;
+    box-shadow:0px 3px 0px #ddd;
 
     img {
       position: absolute;

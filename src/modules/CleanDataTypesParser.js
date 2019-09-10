@@ -15,14 +15,40 @@ class CleanDataTypesParser {
     "passwords",
     "serviceWorkers",
     "webSQL"
-  ]
+  ];
 
-  static getCleanDataTypesOption(dataTypes) {
+  static validUnfilterableDataTypes = [
+    "downloads",
+    "formData",
+    "history",
+    "serverBoundCertificates",
+    "passwords"
+  ];
+
+  static getFilterableCleanDataTypesOption(dataTypes) {
     let cleanDataTypesOption = {};
 
-    dataTypes.forEach(type => {
-      if (CleanDataTypesParser.validDataTypes.indexOf(type) > -1 && !cleanDataTypesOption[type]) {
-        cleanDataTypesOption[type] = true;
+    dataTypes.forEach(dataType => {
+      if (CleanDataTypesParser.validDataTypes.indexOf(dataType) > -1 &&
+        CleanDataTypesParser.validUnfilterableDataTypes.indexOf(dataType) < 0 &&
+        !cleanDataTypesOption[dataType]
+      ) {
+        cleanDataTypesOption[dataType] = true;
+      }
+    });
+
+    return cleanDataTypesOption;
+  }
+
+  static getUnfilterableCleanDataTypesOption(dataTypes) {
+    let cleanDataTypesOption = {};
+
+    dataTypes.forEach(dataType => {
+      if (CleanDataTypesParser.validDataTypes.indexOf(dataType) > -1 &&
+        CleanDataTypesParser.validUnfilterableDataTypes.indexOf(dataType) > -1 &&
+        !cleanDataTypesOption[dataType]
+      ) {
+        cleanDataTypesOption[dataType] = true;
       }
     });
 

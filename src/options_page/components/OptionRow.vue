@@ -2,6 +2,13 @@
   <el-row class="option-row">
     <el-col :span="14" class="option-label">
       {{ label }}
+      <el-tooltip v-if="tip" :content="tip"
+        placement="right">
+        <el-button circle
+          type="text"
+          size="small"
+          icon="el-icon-info"></el-button>
+      </el-tooltip>
     </el-col>
     <el-col :span="10" class="option-control" :class="{'option-control-align-left': controlAlignLeft}">
       <slot></slot>
@@ -20,6 +27,10 @@ export default {
     controlAlignLeft: {
       type: Boolean,
       default: false
+    },
+
+    tip: {
+      type: String
     }
   }
 }

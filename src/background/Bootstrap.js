@@ -6,45 +6,32 @@ import browser from '@/modules/Browser';
 class Bootstrap {
 
   constructor() {
-    this.windows = new Map();
-
     /**
-     * @property {Map}
+     * @type {Map}
      */
     this.windows = new Map();
 
+    /**
+     * @type {Map}
+     */
+    this.windows = new Map();
+
+    /**
+     * @type {App}
+     */
     this.app = new App();
 
     let self = this;
 
     /**
-     * Load storage items and set them to app instance
+     * Load storage items and set them to app instance, when the staroge items has
+     * been setted, call the app onExtensionStartup method if it's exists.
      */
     browser.storage.local.get(items => {
       self.app.storageItems = items;
 
-      /**
-       * Test
-       */
-      if (!items.clearDataTypes) {
-        browser.storage.local.set({
-          clearDataTypes: {
-            "appcache": true,
-            "cache": true,
-            "cacheStorage": true,
-            "cookies": true,
-            "downloads": true,
-            "fileSystems": true,
-            "formData": true,
-            "history": true,
-            "indexedDB": true,
-            "localStorage": true,
-            // "pluginData": true,
-            "passwords": true,
-            "serviceWorkers": true,
-            "webSQL": true
-          }
-        });
+      if (typeof self.app.onExtensionStartup === 'function') {
+        self.app.onExtensionStartup.call(self.app);
       }
     });
 
@@ -55,6 +42,10 @@ class Bootstrap {
       Object.keys(items).forEach(key => {
         self.app.storageItems[key] = items[key].newValue;
       });
+
+      if (typeof self.app.onStorageChanged === 'function') {
+        self.app.onStorageChanged.call(self.app, items);
+      }
     });
 
     /**

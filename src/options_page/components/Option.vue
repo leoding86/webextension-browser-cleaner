@@ -5,6 +5,12 @@
       <el-col :sm="16" :lg="10" :xs="24">
         <el-card>
           <option-row label="Click extension icon to ...">
+            <el-tooltip v-if="clickExtensionIconTo != 1" content="You can right-click the extension icon and click the 'Option' menu to open options page.">
+              <el-button circle
+                size="small"
+                icon="el-icon-info"
+                type="text"></el-button>
+            </el-tooltip>
             <el-select v-model="clickExtensionIconTo"
               size="small">
               <el-option
@@ -17,7 +23,9 @@
           <option-row label="Show notification">
             <el-checkbox v-model="displayNotification"></el-checkbox>
           </option-row>
+
           <el-divider></el-divider>
+
           <option-row label="Clean data in ..."
             :control-align-left="true">
 
@@ -29,7 +37,37 @@
             </el-tree>
 
           </option-row>
+
+          <el-divider></el-divider>
+
+          <option-row label="Whitelist"
+            control-align-left
+            tip="Work for caches, storage and cookies only">
+            <el-input type="textarea"
+              v-model="whitelistText"
+              :spellcheck="false"
+              autosize
+              @blur="handleWhitelistBlur"></el-input>
+          </option-row>
+
+          <option-row label="Clean data types in whitelist">
+            <el-tree ref="cleanDataTypesInWhitelistTree"
+              :data="filterableDataTypes"
+              show-checkbox
+              node-key="type"
+              @check="handleWhitelistDataTypeCheck">
+            </el-tree>
+          </option-row>
         </el-card>
+        <div class="global-actions">
+          <el-tooltip content="Clean data"
+            placement="top">
+            <el-button icon="el-icon-delete"
+              circle
+              type="danger"
+              @click="cleanBrowsingData"></el-button>
+          </el-tooltip>
+        </div>
       </el-col>
     </el-row>
   </div>
@@ -47,6 +85,8 @@ export default {
 
   data() {
     return {
+      whitelistText: '',
+      whitelist: app.storageItems.whitelist,
       clickExtensionIconTo: app.storageItems.clickExtensionIconTo,
       displayNotification: app.storageItems.displayNotification,
       dataTypes: [
@@ -126,6 +166,56 @@ export default {
             }
           ]
         }
+      ],
+      filterableDataTypes: [
+        {
+          type: 'wrapper:cached-images-and-files',
+          label: 'Cached images and files',
+          children: [
+            {
+              type: 'appcache',
+              label: 'App cache'
+            },
+            {
+              type: 'cache',
+              label: 'Cache'
+            },
+            {
+              type: 'cacheStorage',
+              label: 'Cache storage'
+            }
+          ]
+        },
+        {
+          type: 'wrapper:cookies-and-site-data',
+          label: 'Cookies and site data',
+          children: [
+            {
+              type: 'cookies',
+              label: 'Cookies'
+            },
+            {
+              type: 'fileSystems',
+              label: 'File systems'
+            },
+            {
+              type: 'indexedDB',
+              label: 'IndexedDB'
+            },
+            {
+              type: 'localStorage',
+              label: 'Local Storage'
+            },
+            {
+              type: 'serviceWorkers',
+              label: 'Service Workers'
+            },
+            {
+              type: 'webSQL',
+              label: 'Web SQL'
+            }
+          ]
+        }
       ]
     }
   },
@@ -173,6 +263,8 @@ export default {
 
   mounted() {
     this.$refs.cleanDataTypesTree.setCheckedKeys(app.storageItems.cleanDataTypes);
+    this.$refs.cleanDataTypesInWhitelistTree.setCheckedKeys(app.storageItems.cleanWhitelistDataTypes);
+    this.whitelistText = this.whitelist.length > 0 ? this.whitelist.join("\r\n") : '';
   },
 
   methods: {
@@ -184,7 +276,49 @@ export default {
       browser.storage.local.set({
         cleanDataTypes: cleanDataTypes
       });
+    },
+
+    handleWhitelistDataTypeCheck() {
+      let checkedDataTypes = this.$refs.cleanDataTypesInWhitelistTree.getCheckedKeys();
+
+      let cleanWhitelistDataTypes = CleanDataTypesParser.filterCleanDataTypes(checkedDataTypes);
+
+      browser.storage.local.set({
+        cleanWhitelistDataTypes: cleanWhitelistDataTypes
+      });
+    },
+
+    handleWhitelistBlur() {
+      let whitelist = [];
+
+      this.whitelistText.split(/\r\n|\r|\n/).forEach(item => {
+        if (typeof item === 'string' && item.length > 0) {
+          whitelist.push(item);
+        }
+      });
+
+      browser.storage.local.set({
+        whitelist: whitelist
+      });
+    },
+
+    cleanBrowsingData() {
+      let port = browser.runtime.connect();
+      port.postMessage({
+        action: 'cleanBrowsingData'
+      });
     }
   }
 }
 </script>
+
+<style lang="scss">
+.global-actions {
+  margin: 20px 0;
+  text-align: center;
+
+  .el-button {
+    box-shadow: 0 2px 0 #bb5a5a;
+  }
+}
+</style>

@@ -16,9 +16,13 @@ const settings = {
     "webSQL"
   ],
 
+  cleanWhitelistDataTypes: [],
+
   clickExtensionIconTo: 1,
 
-  displayNotification: true
+  displayNotification: true,
+
+  whitelist: []
 };
 
 export default settings;
