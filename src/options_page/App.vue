@@ -41,7 +41,7 @@
 export default {
   data() {
     return {
-      versionName: app.storageItems.versionName
+      versionName: this.$root.$data.storageItems.versionName
     }
   },
 
