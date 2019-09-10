@@ -138,7 +138,11 @@ class App {
               self.showNotification('Site added');
             });
           } else {
-            self.showNotification('Site has been added');
+            if (!matches) {
+              self.showNotification('It\'s a invalid site');
+            } else {
+              self.showNotification('Site has been added');
+            }
           }
         });
       });
