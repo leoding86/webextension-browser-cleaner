@@ -7,16 +7,28 @@ import 'element-ui/lib/theme-chalk/index.css';
 import 'element-ui/lib/theme-chalk/display.css';
 import './index.scss';
 
-const app = window.app = {};
-
 browser.storage.local.get(null, items => {
-  app.storageItems = items;
-
   /* eslint-disable no-new */
   new Vue({
     el: '#app',
 
     router,
+
+    data() {
+      return {
+        storageItems: items
+      }
+    },
+
+    beforeMount() {
+      let vm = this;
+
+      browser.storage.onChanged.addListener(items => {
+        Object.keys(items).forEach(key => {
+          vm.storageItems[key] = items[key].newValue;
+        });
+      });
+    },
 
     render: h => h(App)
   });
