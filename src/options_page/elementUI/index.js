@@ -14,7 +14,8 @@ import {
   Divider,
   Footer,
   Badge,
-  Tree
+  Tree,
+  Tooltip
 } from 'element-ui';
 
 Vue.use(Container);
@@ -32,3 +33,4 @@ Vue.use(Divider);
 Vue.use(Footer);
 Vue.use(Badge);
 Vue.use(Tree);
+Vue.use(Tooltip);
