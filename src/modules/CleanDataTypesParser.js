@@ -25,6 +25,10 @@ class CleanDataTypesParser {
     "passwords"
   ];
 
+  /**
+   *
+   * @param {Array.<String>} dataTypes
+   */
   static getFilterableCleanDataTypesOption(dataTypes) {
     let cleanDataTypesOption = {};
 
@@ -40,6 +44,10 @@ class CleanDataTypesParser {
     return cleanDataTypesOption;
   }
 
+  /**
+   *
+   * @param {Array.<String>} dataTypes
+   */
   static getUnfilterableCleanDataTypesOption(dataTypes) {
     let cleanDataTypesOption = {};
 
@@ -55,6 +63,10 @@ class CleanDataTypesParser {
     return cleanDataTypesOption;
   }
 
+  /**
+   *
+   * @param {Array.<String>} dataTypes
+   */
   static filterCleanDataTypes(dataTypes) {
     let cleanDataTypes = [];
 
