@@ -23,6 +23,20 @@
           <option-row label="Show notification">
             <el-checkbox v-model="displayNotification"></el-checkbox>
           </option-row>
+          <option-row label="Clear browsing and download history in every ...">
+            <el-tooltip content="Recommended setting is greater than 5. Set 0 if you want disable it.">
+              <el-button circle
+                size="small"
+                icon="el-icon-info"
+                type="text"></el-button>
+            </el-tooltip>
+            <el-input-number type="number"
+              controls-position="right"
+              v-model="cleanHistoryInEvery"
+              size="small"
+              :min="0"></el-input-number>
+            <span style="padding-left:10px;font-size:14px;">second(s)</span>
+          </option-row>
 
           <el-divider></el-divider>
 
@@ -89,6 +103,7 @@ export default {
       whitelist: [],
       clickExtensionIconTo: null,
       displayNotification: null,
+      cleanHistoryInEvery: 60,
       dataTypes: [
         {
           type: 'wrapper:browsing-and-download-history',
@@ -247,6 +262,16 @@ export default {
         this.whitelistText = val.whitelist.join('\r\n');
       },
       deep: true
+    },
+
+    cleanHistoryInEvery(val, oldVal) {
+      if (/^\d+$/.test(val)) {
+        browser.storage.local.set({
+          cleanHistoryInEvery: val
+        });
+      } else {
+        this.cleanHistoryInEvery = 0;
+      }
     }
   },
 
@@ -276,6 +301,7 @@ export default {
     this.whitelist = this.storageItems.whitelist;
     this.clickExtensionIconTo = this.storageItems.clickExtensionIconTo;
     this.displayNotification = this.storageItems.displayNotification;
+    this.cleanHistoryInEvery = /^\d+$/.test(this.storageItems.cleanHistoryInEvery) ? this.storageItems.cleanHistoryInEvery : 60;
     this.whitelistText = this.whitelist.length > 0 ? this.whitelist.join("\r\n") : '';
   },
 
