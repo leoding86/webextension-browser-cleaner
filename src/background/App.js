@@ -1,6 +1,8 @@
 import browser from '@/modules/Browser';
 import Notification from '@/modules/Notification';
 import CleanDataTypesParser from '@/modules/CleanDataTypesParser';
+import ScheduledTask from '@/modules/ScheduledTask';
+import CleanHistoryTask from './CleanHistoryTask';
 
 /**
  * @class
@@ -35,35 +37,31 @@ class App {
      */
     this.cleanDataTypesOptionIncludeWhitelist = {};
 
+    /**
+     * @type {Object}
+     */
     this.cleanDataTypesOptionExcludeWhitelist = {};
 
+    /**
+     * @type {Object}
+     */
     this.cleanUnfilterableDataTypesOption = {};
+
+    /**
+     * @type {ScheduledTask}
+     */
+    this.scheduledCleanHistoryTask = null;
 
     browser.browserAction.onClicked.addListener(() => {
       if (this.storageItems.clickExtensionIconTo == 1) {
         browser.runtime.openOptionsPage();
       } else {
-        this.showNotification({
-          type: "basic",
-          iconUrl: "./icon.png",
-          title: "Browser cleaner",
-          message: 'Cleaning browser data'
-        });
+        this.showNotification('Cleaning browser data');
 
         this.cleanBrowsingData().then(() => {
-          this.showNotification({
-            type: "basic",
-            iconUrl: "./icon.png",
-            title: "Browser cleaner",
-            message: 'Clean browser data complete'
-          });
+          this.showNotification('Clean browser data complete');
         }).catch(() => {
-          this.showNotification({
-            type: "basic",
-            iconUrl: "./icon.png",
-            title: "Browser cleaner",
-            message: 'Some error occurred'
-          });
+          this.showNotification('Some error occurred');
         });
       }
     });
@@ -102,19 +100,9 @@ class App {
       port.onMessage.addListener((message, sender) => {
         if (message.action === 'cleanBrowsingData') {
           this.cleanBrowsingData().then(() => {
-            this.showNotification({
-              type: "basic",
-              iconUrl: "./icon.png",
-              title: "Browser cleaner",
-              message: 'Clean browser data complete'
-            });
+            this.showNotification('Clean browser data complete');
           }).catch(() => {
-            this.showNotification({
-              type: "basic",
-              iconUrl: "./icon.png",
-              title: "Browser cleaner",
-              message: 'Some error occurred'
-            });
+            this.showNotification('Some error occurred');
           });
         }
       });
@@ -147,6 +135,16 @@ class App {
         });
       });
     });
+
+    this.scheduledCleanHistoryTask = new ScheduledTask();
+    this.scheduledCleanHistoryTask.debug = __DEBUG__;
+
+    let cleanHistoryTask = new CleanHistoryTask();
+
+    this.scheduledCleanHistoryTask.task = cleanHistoryTask;
+    this.updateTaskInterval(this.scheduledCleanHistoryTask, this.storageItems.cleanHistoryInEvery * 1000);
+
+    this.scheduledCleanHistoryTask.run();
   }
 
   onBrowserStartup() {
@@ -172,6 +170,27 @@ class App {
     if (undefined !== storageItems.cleanWhitelistDataTypes) {
       this.cleanDataTypesOptionIncludeWhitelist =
         CleanDataTypesParser.getFilterableCleanDataTypesOption(storageItems.cleanWhitelistDataTypes.newValue);
+    }
+
+    if (undefined !== storageItems.cleanHistoryInEvery) {
+      this.updateTaskInterval(this.scheduledCleanHistoryTask, storageItems.cleanHistoryInEvery.newValue * 1000);
+    }
+  }
+
+  /**
+   *
+   * @param {ScheduledTask} scheduledTask
+   * @param {*} intervalTime
+   */
+  updateTaskInterval(scheduledTask, intervalTime) {
+    if (/^[1-9]\d*$/.test(intervalTime)) {
+      scheduledTask.setIntervalTime(intervalTime);
+
+      if (scheduledTask.status === ScheduledTask.STOP) {
+        scheduledTask.restart();
+      }
+    } else if (intervalTime == 0) {
+      scheduledTask.stop();
     }
   }
 
