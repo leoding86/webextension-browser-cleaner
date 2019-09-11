@@ -3,6 +3,10 @@ The extension will clear your browser data when you open\close the browser autom
 Github:
 https://github.com/leoding86/webextension-browser-cleaner
 ----------------------------------------------
+v0.11 beta
+Add a setting for periodically cleaning data (Disabled by default);
+Minor fix.
+
 v0.10 beta
 Improve user experiences for adding site to whitelist;
 Minor fix.
