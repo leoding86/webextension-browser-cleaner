@@ -22,7 +22,9 @@ const settings = {
 
   displayNotification: true,
 
-  whitelist: []
+  whitelist: [],
+
+  cleanHistoryInEvery: 0
 };
 
 export default settings;
