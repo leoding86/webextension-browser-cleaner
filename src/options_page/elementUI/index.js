@@ -1,4 +1,7 @@
 import Vue from 'vue';
+import lang from 'element-ui/lib/locale/lang/en'
+import locale from 'element-ui/lib/locale'
+
 import {
   Container,
   Header,
@@ -15,8 +18,11 @@ import {
   Footer,
   Badge,
   Tree,
-  Tooltip
+  Tooltip,
+  InputNumber
 } from 'element-ui';
+
+locale.use(lang);
 
 Vue.use(Container);
 Vue.use(Header);
@@ -34,3 +40,4 @@ Vue.use(Footer);
 Vue.use(Badge);
 Vue.use(Tree);
 Vue.use(Tooltip);
+Vue.use(InputNumber);
