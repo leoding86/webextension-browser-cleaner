@@ -1,5 +1,7 @@
 const utils = require('./utils');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const webpack = require('webpack')
+const merge = require('webpack-merge');
 
 const config = {
   output: {
@@ -36,19 +38,24 @@ const config = {
   externals: {
     browser: 'browser',
     chrome: 'chrome'
-  }
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      __DEBUG__: process.env.NODE_ENV !== 'production'
+    })
+  ]
 };
 
 let _config;
 
 if (process.env.NODE_ENV === 'production') {
-  _config = Object.assign({}, config, {
+  _config = merge.smart(config, {
     plugins: [
       new UglifyJsPlugin()
     ]
   });
 } else {
-  _config = Object.assign({}, config, {
+  _config = merge.smart(config, {
     devtool: 'inline-source-map'
   });
 }
